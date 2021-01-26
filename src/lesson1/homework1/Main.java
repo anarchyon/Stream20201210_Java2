@@ -30,10 +30,12 @@ public class Main {
     public static final int STAGE_COUNT = 8;
 
     public static void main(String[] args) {
-        Human human = new Human(HUMAN_AVERAGE_JUMP_HEIGHT, HUMAN_JUMP_SPREAD, HUMAN_AVERAGE_RUN_DISTANCE, HUMAN_DISTANCE_SPREAD);
-        Cat cat = new Cat(CAT_AVERAGE_JUMP_HEIGHT, CAT_JUMP_SPREAD, CAT_AVERAGE_RUN_DISTANCE, CAT_DISTANCE_SPREAD);
-        Robot robot = new Robot(ROBOT_AVERAGE_JUMP_HEIGHT, ROBOT_JUMP_SPREAD, ROBOT_AVERAGE_RUN_DISTANCE, ROBOT_DISTANCE_SPREAD);
-        ArrayList<AbleToJumpAndRun> participants = new ArrayList<>();
+        Team randomTeam = new Team("Ракета", Team.TEAM_RANDOM);
+        Team defaultTeam = new Team("Метеор", Team.TEAM_DEFAULT);
+        Human human = new Human();
+        Cat cat = new Cat();
+        Robot robot = new Robot();
+        ArrayList<ObstaclesOvercoming> participants = new ArrayList<>();
         participants.add(human);
         participants.add(cat);
         participants.add(robot);
@@ -44,8 +46,9 @@ public class Main {
             stages.add(new Treadmill(AVERAGE_DISTANCE, DISTANCE_SPREAD));
         }
 
-        for (AbleToJumpAndRun participant : participants) {
+        for (ObstaclesOvercoming participant : participants) {
             System.out.println("Участник " + participant.toString());
+            participant.getStarted();
             for (Object object : stages) {
                 participant.jumpOver(object);
                 participant.run(object);

@@ -1,6 +1,8 @@
 package lesson1.homework1;
 
-public class Human implements AbleToJumpAndRun, WithRandom {
+public class Human implements ObstaclesOvercoming, WithRandom {
+    private static final String TYPE = "Человек";
+
     private String name;
     private double jumpHeight;
     private double runDistance;
@@ -8,13 +10,19 @@ public class Human implements AbleToJumpAndRun, WithRandom {
 
     private static int counter;
 
+    Human() {
+        jumpHeight = getRandom(Main.HUMAN_AVERAGE_JUMP_HEIGHT, Main.HUMAN_JUMP_SPREAD);
+        runDistance = getRandom(Main.HUMAN_AVERAGE_RUN_DISTANCE, Main.HUMAN_DISTANCE_SPREAD);
+        name = TYPE + ++counter;
+    }
+
     Human(double averageHeight, double spreadJump, double averageDistance, double spreadDistance) {
         jumpHeight = getRandom(averageHeight, spreadJump);
         runDistance = getRandom(averageDistance, spreadDistance);
-        name = "Human" + ++counter;
-        isTrialSuccess = true;
+        name = TYPE + ++counter;
     }
 
+    @Override
     public void getStarted() {
         isTrialSuccess = true;
     }
@@ -27,7 +35,7 @@ public class Human implements AbleToJumpAndRun, WithRandom {
     @Override
     public void jumpOver(Object object) {
         if (object instanceof Obstacle) {
-            double obstacleHeight = ((Obstacle)object).getHeight();
+            double obstacleHeight = ((Obstacle) object).getHeight();
             if (jumpHeight < obstacleHeight) isTrialSuccess = false;
         }
     }
@@ -35,13 +43,17 @@ public class Human implements AbleToJumpAndRun, WithRandom {
     @Override
     public void run(Object object) {
         if (object instanceof Treadmill) {
-            double distance = ((Treadmill)object).getDistance();
+            double distance = ((Treadmill) object).getDistance();
             if (runDistance < distance) isTrialSuccess = false;
         }
     }
 
     @Override
-    public String toString(){
-        return String.format("Человек %s", name);
+    public String toString() {
+        return (TYPE + " " + name);
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }
