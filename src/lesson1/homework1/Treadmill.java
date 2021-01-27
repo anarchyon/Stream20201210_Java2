@@ -1,18 +1,15 @@
 package lesson1.homework1;
 
-public class Treadmill implements WithRandom{
-    private final double distance;
+public class Treadmill extends Obstacle{
 
-    Treadmill(double averageDistance, double spread) {
-        distance = getRandom(averageDistance, spread);
+    Treadmill() {
+        super(DefaultParameters.AVERAGE_DISTANCE, DefaultParameters.DISTANCE_SPREAD);
+        type = DefaultParameters.OBSTACLE_TYPE_CAN_BE_RUN;
     }
 
-    public double getDistance() {
-        return distance;
-    }
 
     @Override
     public String toString() {
-        return String.format("Дорожка длиной %.2fм", distance);
+        return String.format("Дорожка длиной %.2fм", obstacleSize);
     }
 }

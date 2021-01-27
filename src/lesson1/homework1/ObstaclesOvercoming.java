@@ -2,9 +2,9 @@ package lesson1.homework1;
 
 public interface ObstaclesOvercoming {
 
-    void jumpOver(Object object);
+    void jumpOver(Obstacle obstacle);
 
-    void run(Object object);
+    void run(Obstacle obstacle);
 
     boolean isTrialSuccess();
 

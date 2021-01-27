@@ -1,7 +1,6 @@
 package lesson1.homework1;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 public class Team {
@@ -9,10 +8,17 @@ public class Team {
     public static final int TEAM_RANDOM = 1;
     public static final int TEAM_MANUAL = 2;
     public static final int TEAM_COUNT_DEFAULT = 4;
-    public static final int CURRENT_COUNT_TYPES = 3;
+    public static final int CURRENT_MEMBER_TYPES_COUNT = 3;
+
+    private boolean wasTeamInCompetition;
 
     private String teamName;
-    private List<ObstaclesOvercoming> listOfMembers;
+    private ArrayList<ObstaclesOvercoming> listOfMembers;
+
+    Team(String teamName) {
+        this.teamName = teamName;
+        listOfMembers = new ArrayList<>();
+    }
 
     Team(String teamName, int typeOfTeam) {
         this.teamName = teamName;
@@ -41,7 +47,7 @@ public class Team {
     private void fillTeamRandom() {
         Random random = new Random();
         for (int i = 0; i < TEAM_COUNT_DEFAULT; i++) {
-            int p = random.nextInt(CURRENT_COUNT_TYPES);
+            int p = random.nextInt(CURRENT_MEMBER_TYPES_COUNT);
             switch (p) {
                 case 0:
                     listOfMembers.add(new Cat());
@@ -60,5 +66,34 @@ public class Team {
     private void fillTeamManual() {
         //TODO
         fillTeamDefault();
+    }
+
+    public void addMember(ObstaclesOvercoming member) {
+        listOfMembers.add(member);
+    }
+
+    public String getTeamName() {
+        return teamName;
+    }
+
+    public ArrayList<ObstaclesOvercoming> getListOfMembers() {
+        return listOfMembers;
+    }
+
+    public String teamMembersInfo() {
+        return String.format("Участники команды %s: %s", teamName, listOfMembers.toString());
+    }
+
+    public String competitionInfo() {
+        if (wasTeamInCompetition) {
+            ArrayList<ObstaclesOvercoming> passed = new ArrayList<>();
+            for (ObstaclesOvercoming member : listOfMembers){
+                if (member.isTrialSuccess()){
+                    passed.add(member);
+                }
+            }
+            return String.format("Список участников команды %s, прошедших испытания: %s", teamName, passed.toString());
+        }
+        return String.format("Команда %s не участвовала в испытаниях", teamName);
     }
 }

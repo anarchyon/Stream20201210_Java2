@@ -1,33 +1,10 @@
 package lesson1.homework1;
 
+import com.sun.xml.internal.ws.api.model.wsdl.WSDLOutput;
+
 import java.util.ArrayList;
 
 public class Main {
-    public static final double HUMAN_AVERAGE_JUMP_HEIGHT = 0.7;
-    public static final double HUMAN_JUMP_SPREAD = 0.6;
-
-    public static final double CAT_AVERAGE_JUMP_HEIGHT = 1.2;
-    public static final double CAT_JUMP_SPREAD = 0.5;
-
-    public static final double ROBOT_AVERAGE_JUMP_HEIGHT = 1;
-    public static final double ROBOT_JUMP_SPREAD = 0.3;
-
-    public static final double OBSTACLE_AVERAGE_HEIGHT = 0.6;
-    public static final double OBSTACLE_HEIGHT_SPREAD = 0.2;
-
-    public static final double HUMAN_AVERAGE_RUN_DISTANCE = 1600;
-    public static final double HUMAN_DISTANCE_SPREAD = 0.3;
-
-    public static final double CAT_AVERAGE_RUN_DISTANCE = 500;
-    public static final double CAT_DISTANCE_SPREAD = 0.4;
-
-    public static final double ROBOT_AVERAGE_RUN_DISTANCE = 2000;
-    public static final double ROBOT_DISTANCE_SPREAD = 0.4;
-
-    public static final double AVERAGE_DISTANCE = 700;
-    public static final double DISTANCE_SPREAD = 0.5;
-
-    public static final int STAGE_COUNT = 8;
 
     public static void main(String[] args) {
         Team randomTeam = new Team("Ракета", Team.TEAM_RANDOM);
@@ -40,28 +17,34 @@ public class Main {
         participants.add(cat);
         participants.add(robot);
 
-        ArrayList<Object> stages = new ArrayList<>();
+        System.out.println(randomTeam.teamMembersInfo());
+        System.out.println(randomTeam.competitionInfo());
+        System.out.println(defaultTeam.teamMembersInfo());
+        System.out.println(randomTeam.competitionInfo());
+/*
+        ArrayList<Obstacle> obstacles = new ArrayList<>();
         for (int i = 0; i < STAGE_COUNT / 2; i++) {
-            stages.add(new Obstacle(OBSTACLE_AVERAGE_HEIGHT, OBSTACLE_HEIGHT_SPREAD));
-            stages.add(new Treadmill(AVERAGE_DISTANCE, DISTANCE_SPREAD));
+            obstacles.add(new Wall());
+            obstacles.add(new Treadmill());
         }
 
         for (ObstaclesOvercoming participant : participants) {
             System.out.println("Участник " + participant.toString());
             participant.getStarted();
-            for (Object object : stages) {
-                participant.jumpOver(object);
-                participant.run(object);
+            for (Obstacle obstacle : obstacles) {
+                participant.jumpOver(obstacle);
+                participant.run(obstacle);
                 if (!participant.isTrialSuccess()) {
-                    System.out.printf("%s не смог преодолеть препятствие №%s: %s\n", participant.toString(), stages.indexOf(object) + 1, object.toString());
+                    System.out.printf("%s не смог преодолеть препятствие №%s: %s\n", participant.toString(), obstacles.indexOf(obstacle) + 1, obstacle.toString());
                     break;
                 }
-                System.out.printf("Препятствие №%s преодолено\n", stages.indexOf(object) + 1);
+                System.out.printf("Препятствие №%s преодолено\n", obstacles.indexOf(obstacle) + 1);
             }
             if (participant.isTrialSuccess()) {
                 System.out.printf("%s преодолел все препятствия!\n", participant.toString());
             }
 
         }
+*/
     }
 }

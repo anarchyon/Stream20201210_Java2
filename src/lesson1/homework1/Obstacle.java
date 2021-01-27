@@ -1,18 +1,18 @@
 package lesson1.homework1;
 
-public class Obstacle implements WithRandom {
-    private final double height;
+public abstract class Obstacle implements WithRandom{
+    int type;
+    double obstacleSize;
 
-    Obstacle(double averageHeight, double spread) {
-        height = getRandom(averageHeight, spread);
+    public Obstacle (double averageSize, double spread) {
+        obstacleSize = getRandom(averageSize, spread);
     }
 
-    public double getHeight() {
-        return height;
+    public int getType() {
+        return type;
     }
 
-    @Override
-    public String toString () {
-        return String.format("Стена высотой %.2fм", height);
+    public double getObstacleSize(){
+        return obstacleSize;
     }
 }

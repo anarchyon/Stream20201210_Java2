@@ -11,8 +11,8 @@ public class Cat implements ObstaclesOvercoming, WithRandom {
     private static int counter;
 
     Cat() {
-        jumpHeight = getRandom(Main.CAT_AVERAGE_JUMP_HEIGHT, Main.CAT_JUMP_SPREAD);
-        runDistance = getRandom(Main.CAT_AVERAGE_RUN_DISTANCE, Main.CAT_DISTANCE_SPREAD);
+        jumpHeight = getRandom(DefaultParameters.CAT_AVERAGE_JUMP_HEIGHT, DefaultParameters.CAT_JUMP_SPREAD);
+        runDistance = getRandom(DefaultParameters.CAT_AVERAGE_RUN_DISTANCE, DefaultParameters.CAT_DISTANCE_SPREAD);
         name = TYPE + ++counter;
     }
 
@@ -33,17 +33,17 @@ public class Cat implements ObstaclesOvercoming, WithRandom {
     }
 
     @Override
-    public void jumpOver(Object object) {
-        if (object instanceof Obstacle) {
-            double obstacleHeight = ((Obstacle) object).getHeight();
+    public void jumpOver(Obstacle obstacle) {
+        if (obstacle.getType() == DefaultParameters.OBSTACLE_TYPE_CAN_BE_JUMPED_OVER) {
+            double obstacleHeight = obstacle.getObstacleSize();
             if (jumpHeight < obstacleHeight) isTrialSuccess = false;
         }
     }
 
     @Override
-    public void run(Object object) {
-        if (object instanceof Treadmill) {
-            double distance = ((Treadmill) object).getDistance();
+    public void run(Obstacle obstacle) {
+        if (obstacle.getType() == DefaultParameters.OBSTACLE_TYPE_CAN_BE_RUN) {
+            double distance = obstacle.getObstacleSize();
             if (runDistance < distance) isTrialSuccess = false;
         }
     }
