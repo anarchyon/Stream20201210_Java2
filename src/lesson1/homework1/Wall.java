@@ -7,6 +7,11 @@ public class Wall extends Obstacle {
         type = DefaultParameters.OBSTACLE_TYPE_CAN_BE_JUMPED_OVER;
     }
 
+    Wall(double height) {
+        super();
+        this.obstacleSize = height;
+    }
+
     @Override
     public String toString () {
         return String.format("Стена высотой %.2fм", obstacleSize);

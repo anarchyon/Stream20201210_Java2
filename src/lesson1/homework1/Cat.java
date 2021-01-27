@@ -7,6 +7,7 @@ public class Cat implements ObstaclesOvercoming, WithRandom {
     private double jumpHeight;
     private double runDistance;
     private boolean isTrialSuccess;
+    private boolean isKnownObstacle;
 
     private static int counter;
 
@@ -25,6 +26,7 @@ public class Cat implements ObstaclesOvercoming, WithRandom {
     @Override
     public void getStarted() {
         isTrialSuccess = true;
+        isKnownObstacle = true;
     }
 
     @Override
@@ -33,18 +35,21 @@ public class Cat implements ObstaclesOvercoming, WithRandom {
     }
 
     @Override
-    public void jumpOver(Obstacle obstacle) {
-        if (obstacle.getType() == DefaultParameters.OBSTACLE_TYPE_CAN_BE_JUMPED_OVER) {
-            double obstacleHeight = obstacle.getObstacleSize();
-            if (jumpHeight < obstacleHeight) isTrialSuccess = false;
-        }
-    }
+    public boolean isKnownObstacle() { return isKnownObstacle; }
 
     @Override
-    public void run(Obstacle obstacle) {
-        if (obstacle.getType() == DefaultParameters.OBSTACLE_TYPE_CAN_BE_RUN) {
-            double distance = obstacle.getObstacleSize();
-            if (runDistance < distance) isTrialSuccess = false;
+    public void analyzeObstacle(Obstacle obstacle) {
+        switch (obstacle.getType()) {
+            case DefaultParameters.OBSTACLE_TYPE_CAN_BE_JUMPED_OVER:
+                isTrialSuccess = jumpOver(jumpHeight, obstacle);
+                break;
+            case DefaultParameters.OBSTACLE_TYPE_CAN_BE_RUN:
+                isTrialSuccess = run(runDistance, obstacle);
+                break;
+            default:
+                isTrialSuccess = false;
+                isKnownObstacle = false;
+                break;
         }
     }
 

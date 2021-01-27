@@ -1,6 +1,7 @@
 package lesson1.homework1;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Course {
     public static final int OBSTACLES_COUNT_DEFAULT = 8;
@@ -10,9 +11,9 @@ public class Course {
 
     private ArrayList<Obstacle> obstacles;
 
-    Course(int obstaclesListType){
+    Course(int obstaclesListType) {
         obstacles = new ArrayList<>();
-        switch (obstaclesListType){
+        switch (obstaclesListType) {
             case OBSTACLES_LIST_RANDOM:
                 fillObstaclesListRandom();
                 break;
@@ -34,7 +35,20 @@ public class Course {
     }
 
     private void fillObstaclesListRandom() {
+        Random random = new Random();
+        for (int i = 0; i < OBSTACLES_COUNT_DEFAULT; i++) {
+            int o = random.nextInt(DefaultParameters.CURRENT_OBSTACLE_TYPES_COUNT);
+            switch (o) {
+                case 1:
+                    obstacles.add(new Treadmill());
+                    break;
+                case 0:
+                default:
+                    obstacles.add(new Wall());
+                    break;
 
+            }
+        }
     }
 
     private void fillObstaclesListManual() {
@@ -44,5 +58,19 @@ public class Course {
 
     public void addObstacle(Obstacle obstacle) {
         obstacles.add(obstacle);
+    }
+
+    public void startCompetition(Team team) {
+        for (ObstaclesOvercoming participant : team.getListOfMembers()) {
+            participant.getStarted();
+            for (Obstacle obstacle : obstacles) {
+                participant.analyzeObstacle(obstacle);
+                System.out.println(participant.getReport(participant.isKnownObstacle(), participant.isTrialSuccess()));
+                if (!participant.isTrialSuccess()) {
+                    break;
+                }
+            }
+        }
+        team.setWasTeamInCompetition(true);
     }
 }

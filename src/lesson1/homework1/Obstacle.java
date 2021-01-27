@@ -4,6 +4,10 @@ public abstract class Obstacle implements WithRandom{
     int type;
     double obstacleSize;
 
+    public Obstacle(){
+
+    }
+
     public Obstacle (double averageSize, double spread) {
         obstacleSize = getRandom(averageSize, spread);
     }

@@ -7,6 +7,11 @@ public class Treadmill extends Obstacle{
         type = DefaultParameters.OBSTACLE_TYPE_CAN_BE_RUN;
     }
 
+    Treadmill(double distance) {
+        super();
+        this.obstacleSize = distance;
+    }
+
 
     @Override
     public String toString() {
