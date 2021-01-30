@@ -1,7 +1,12 @@
-package lesson1.homework1;
+package lesson1.homework1.participants;
 
-public class Cat implements ObstaclesOvercoming, WithRandom {
-    private static final String TYPE = "Кошка";
+import lesson1.homework1.common.DefaultParameters;
+import lesson1.homework1.common.ObstaclesOvercoming;
+import lesson1.homework1.common.WithRandom;
+import lesson1.homework1.obstacles.Obstacle;
+
+public class Human implements ObstaclesOvercoming, WithRandom {
+    private static final String TYPE = "Человек";
 
     private String name;
     private double jumpHeight;
@@ -11,13 +16,13 @@ public class Cat implements ObstaclesOvercoming, WithRandom {
 
     private static int counter;
 
-    Cat() {
-        jumpHeight = getRandom(DefaultParameters.CAT_AVERAGE_JUMP_HEIGHT, DefaultParameters.CAT_JUMP_SPREAD);
-        runDistance = getRandom(DefaultParameters.CAT_AVERAGE_RUN_DISTANCE, DefaultParameters.CAT_DISTANCE_SPREAD);
+    public Human() {
+        jumpHeight = getRandom(DefaultParameters.HUMAN_AVERAGE_JUMP_HEIGHT, DefaultParameters.HUMAN_JUMP_SPREAD);
+        runDistance = getRandom(DefaultParameters.HUMAN_AVERAGE_RUN_DISTANCE, DefaultParameters.HUMAN_DISTANCE_SPREAD);
         name = TYPE + ++counter;
     }
 
-    Cat(double averageHeight, double spreadJump, double averageDistance, double spreadDistance) {
+    public Human(double averageHeight, double spreadJump, double averageDistance, double spreadDistance) {
         jumpHeight = getRandom(averageHeight, spreadJump);
         runDistance = getRandom(averageDistance, spreadDistance);
         name = TYPE + ++counter;
@@ -55,7 +60,7 @@ public class Cat implements ObstaclesOvercoming, WithRandom {
 
     @Override
     public String toString() {
-        return TYPE + " " + name;
+        return (TYPE + " " + name);
     }
 
     public void setName(String name) {

@@ -1,4 +1,7 @@
-package lesson1.homework1;
+package lesson1.homework1.participants;
+
+import lesson1.homework1.common.DefaultParameters;
+import lesson1.homework1.common.ObstaclesOvercoming;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -14,12 +17,12 @@ public class Team {
     private String teamName;
     private ArrayList<ObstaclesOvercoming> listOfMembers;
 
-    Team(String teamName) {
+    public Team(String teamName) {
         this.teamName = teamName;
         listOfMembers = new ArrayList<>();
     }
 
-    Team(String teamName, int typeOfTeam) {
+    public Team(String teamName, int typeOfTeam) {
         this.teamName = teamName;
         listOfMembers = new ArrayList<>();
         switch (typeOfTeam) {

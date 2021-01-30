@@ -1,13 +1,15 @@
-package lesson1.homework1;
+package lesson1.homework1.obstacles;
+
+import lesson1.homework1.common.DefaultParameters;
 
 public class Treadmill extends Obstacle{
 
-    Treadmill() {
+    public Treadmill() {
         super(DefaultParameters.AVERAGE_DISTANCE, DefaultParameters.DISTANCE_SPREAD);
         type = DefaultParameters.OBSTACLE_TYPE_CAN_BE_RUN;
     }
 
-    Treadmill(double distance) {
+    public Treadmill(double distance) {
         super();
         this.obstacleSize = distance;
     }

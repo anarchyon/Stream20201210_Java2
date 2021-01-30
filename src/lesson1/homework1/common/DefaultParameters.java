@@ -1,4 +1,4 @@
-package lesson1.homework1;
+package lesson1.homework1.common;
 
 public final class DefaultParameters {
     public static final double HUMAN_AVERAGE_JUMP_HEIGHT = 0.7;

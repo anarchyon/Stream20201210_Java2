@@ -1,6 +1,8 @@
-package lesson1.homework1;
+package lesson1.homework1.obstacles;
 
-public abstract class Obstacle implements WithRandom{
+import lesson1.homework1.common.WithRandom;
+
+public abstract class Obstacle implements WithRandom {
     int type;
     double obstacleSize;
 

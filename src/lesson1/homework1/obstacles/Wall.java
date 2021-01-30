@@ -1,13 +1,15 @@
-package lesson1.homework1;
+package lesson1.homework1.obstacles;
+
+import lesson1.homework1.common.DefaultParameters;
 
 public class Wall extends Obstacle {
 
-    Wall() {
+    public Wall() {
         super(DefaultParameters.OBSTACLE_AVERAGE_HEIGHT, DefaultParameters.OBSTACLE_HEIGHT_SPREAD);
         type = DefaultParameters.OBSTACLE_TYPE_CAN_BE_JUMPED_OVER;
     }
 
-    Wall(double height) {
+    public Wall(double height) {
         super();
         this.obstacleSize = height;
     }

@@ -1,4 +1,8 @@
-package lesson1.homework1;
+package lesson1.homework1.obstacles;
+
+import lesson1.homework1.common.DefaultParameters;
+import lesson1.homework1.common.ObstaclesOvercoming;
+import lesson1.homework1.participants.Team;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -11,7 +15,7 @@ public class Course {
 
     private ArrayList<Obstacle> obstacles;
 
-    Course(int obstaclesListType) {
+    public Course(int obstaclesListType) {
         obstacles = new ArrayList<>();
         switch (obstaclesListType) {
             case OBSTACLES_LIST_RANDOM:

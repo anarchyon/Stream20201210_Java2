@@ -1,4 +1,6 @@
-package lesson1.homework1;
+package lesson1.homework1.common;
+
+import lesson1.homework1.obstacles.Obstacle;
 
 public interface ObstaclesOvercoming {
 

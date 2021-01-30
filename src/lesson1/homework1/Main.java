@@ -1,5 +1,8 @@
 package lesson1.homework1;
 
+import lesson1.homework1.obstacles.Course;
+import lesson1.homework1.participants.Team;
+
 public class Main {
 
     public static void main(String[] args) {
