@@ -18,14 +18,10 @@ public class PhoneBook {
     }
 
     public String get(String name){
-        StringBuilder answer = new StringBuilder();
-        Iterator<String> it = phones.keySet().iterator();
-        while (it.hasNext()){
-            String key = it.next();
-            if (name.equals(key)) {
-                answer.append(phones.get(key));
-            }
+        if (phones.containsKey(name)) {
+            return (phones.get(name)).toString();
+        } else {
+            return "Фамилия не найдена";
         }
-        return answer.toString();
     }
 }

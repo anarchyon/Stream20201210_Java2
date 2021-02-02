@@ -53,7 +53,7 @@ public class Main {
         System.out.printf("Поиск телефонных номеров по фамилии %s:\n", toFind);
         System.out.println(phoneBook.get(toFind));
 
-        toFind = "ddd";
+        toFind = "eee";
         System.out.printf("Поиск телефонных номеров по фамилии %s:\n", toFind);
         System.out.println(phoneBook.get(toFind));
     }
