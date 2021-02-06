@@ -24,17 +24,25 @@ public class Main {
                 "альфа"
         };
         System.out.println(Arrays.asList(words));
+        /*
+        рефакторинг после подсказок преподавателя после проверки домашки
+        оставляю свой старый код закомментированным, чтобы видеть насколько новый код лаконичнее
         TreeSet<String> set = new TreeSet<>(Arrays.asList(words));
         System.out.println(set);
+         */
         TreeMap<String, Integer> treeMap = new TreeMap<>();
-        for (String stringInSet : set) {
+        for (String stringInArray : words) {
+            /*
             int sum = 0;
             for (String stringInArray : words) {
                 if (stringInSet.equals(stringInArray)) sum++;
             }
-            treeMap.put(stringInSet, sum);
+             */
+            treeMap.put(stringInArray, treeMap.getOrDefault(stringInArray, 0) + 1);
         }
-        treeMap.forEach((k, v) -> System.out.println(k + ": " + v));
+        //treeMap.forEach((k, v) -> System.out.println(k + ": " + v));
+        System.out.println(treeMap);
+        System.out.println(treeMap.keySet());
 
         PhoneBook phoneBook = new PhoneBook();
         phoneBook.add("aaa", "+7-999-999-99-99");
