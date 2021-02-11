@@ -12,9 +12,12 @@ public class MainWindow extends JFrame {
         setSize(WIDTH, HEIGHT);
         setResizable(false);
         setTitle("RGBCircles");
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         gamePanel = new GamePanel();
+        add(gamePanel);
 
         setVisible(true);
+
     }
 
 
