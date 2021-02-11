@@ -1,7 +1,6 @@
 package facultative1;
 
 import facultative1.entities.Circle;
-import facultative1.entities.HeroCircle;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,7 +27,8 @@ public class GamePanel extends JPanel {
     }
 
     public void drawCircle(Graphics g, Circle circle) {
-        g.fillOval(circle.getX(), circle.getY(), circle.getWidth(), circle.getHeight());
+        g.setColor(circle.getColor());
+        g.fillOval(circle.getX(), circle.getY(), circle.getDiameter(), circle.getDiameter());
         repaint();
     }
 
@@ -41,6 +41,9 @@ public class GamePanel extends JPanel {
 
     private void draw(Graphics g) {
         drawCircle(g, manager.getHero());
+        for(Circle enemy : manager.getEnemies()) {
+            drawCircle(g, enemy);
+        }
     }
 
     public void setManager(Manager manager) {

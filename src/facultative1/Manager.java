@@ -22,11 +22,20 @@ public class Manager {
         enemies = new ArrayList<>();
         for (int i = 0; i < CircleParams.NUMBER_OF_ENEMY; i++) {
             enemies.add(EnemyCircle.getRandomCircle());
+            if (enemies.get(i).getDiameter() < hero.getDiameter()) {
+                enemies.get(i).setColor(CircleParams.ENEMY_COLOR_WEAK);
+            } else {
+                enemies.get(i).setColor(CircleParams.ENEMY_COLOR_STRONG);
+            }
         }
     }
 
     public HeroCircle getHero() {
         return hero;
+    }
+
+    public ArrayList<EnemyCircle> getEnemies() {
+        return enemies;
     }
 
     public void go(int x, int y) {

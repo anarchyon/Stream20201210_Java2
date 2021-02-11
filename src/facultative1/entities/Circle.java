@@ -4,23 +4,18 @@ import java.awt.*;
 
 public abstract class Circle {
     int x, y;
-    int width, height;
+    int diameter;
     int speed;
     Color color;
 
-    public Circle(int x, int y, int width, int height) {
+    public Circle(int x, int y, int diameter) {
         this.x = x;
         this.y = y;
-        this.width = width;
-        this.height = height;
+        this.diameter = diameter;
     }
 
-    public int getWidth() {
-        return width;
-    }
-
-    public int getHeight() {
-        return height;
+    public int getDiameter() {
+        return diameter;
     }
 
     public int getX() {
@@ -31,4 +26,11 @@ public abstract class Circle {
         return y;
     }
 
+    public Color getColor() {
+        return color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
+    }
 }
