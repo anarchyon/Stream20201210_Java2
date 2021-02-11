@@ -15,6 +15,7 @@ public class ChatWindow extends JFrame {
     public ChatWindow() {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         Dimension windowSize = new Dimension(MINIMUM_WIDTH, MINIMUM_HEIGHT);
+        setTitle("Net Messenger");
         setSize(windowSize);
         setMinimumSize(windowSize);
         setLocation((screenSize.width - windowSize.width) / 2, (screenSize.height - windowSize.height) / 2);
