@@ -14,7 +14,8 @@ public class GamePanel extends JPanel {
 
     private Circle hero;
 
-    public GamePanel () {
+    public GamePanel (int width, int height) {
+        setSize(width, height);
         manager = new Manager(this);
         addMouseMotionListener(new MouseMotionAdapter() {
             @Override
@@ -26,6 +27,9 @@ public class GamePanel extends JPanel {
         setBackground(Color.gray);
     }
 
+    public void init() {
+    }
+
     public void drawCircle(Graphics g, Circle circle) {
         g.setColor(circle.getColor());
         g.fillOval(circle.getX(), circle.getY(), circle.getDiameter(), circle.getDiameter());
@@ -35,6 +39,7 @@ public class GamePanel extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        manager.goEnemies();
         draw(g);
         repaint();
     }

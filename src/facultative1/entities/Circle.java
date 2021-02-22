@@ -4,8 +4,9 @@ import java.awt.*;
 
 public abstract class Circle {
     int x, y;
+    double dX, dY;
     int diameter;
-    int speed;
+    double speed;
     Color color;
 
     public Circle(int x, int y, int diameter) {
@@ -32,5 +33,21 @@ public abstract class Circle {
 
     public void setColor(Color color) {
         this.color = color;
+    }
+
+    public void move() {
+        x += dX * speed;
+        y += dY * speed;
+    }
+
+    public void checkBounds(int width, int height) {
+        int x2 = x + (int)(dX * speed);
+        int y2 = y + (int)(dY * speed);
+        if ((x2 - diameter / 2) < 0 || (x2 + diameter / 2) > width) {
+            dX = -dX;
+        }
+        if ((y2 - diameter / 2) < 0 || (y2 + diameter / 2) > height) {
+            dY = -dY;
+        }
     }
 }

@@ -18,10 +18,10 @@ public class Manager {
     }
 
     private void init() {
-        hero = new HeroCircle(MainWindow.WIDTH / 2, MainWindow.HEIGHT / 2);
+        hero = new HeroCircle(gameField.getWidth() / 2, gameField.getHeight() / 2);
         enemies = new ArrayList<>();
         for (int i = 0; i < CircleParams.NUMBER_OF_ENEMY; i++) {
-            enemies.add(EnemyCircle.getRandomCircle());
+            enemies.add(EnemyCircle.getRandomCircle(gameField.getWidth(), gameField.getHeight()));
             if (enemies.get(i).getDiameter() < hero.getDiameter()) {
                 enemies.get(i).setColor(CircleParams.ENEMY_COLOR_WEAK);
             } else {
@@ -40,5 +40,12 @@ public class Manager {
 
     public void go(int x, int y) {
         hero.move(x, y);
+    }
+
+    public void goEnemies() {
+        for (EnemyCircle enemyCircle : enemies) {
+            enemyCircle.checkBounds(gameField.getWidth(), gameField.getHeight());
+            enemyCircle.move();
+        }
     }
 }
