@@ -46,6 +46,8 @@ public class ClientHandler {
                     nick = tNick;
                     server.broadcastMessage(nick + " присоединился к чату");
                     break;
+                } else {
+                    out.writeUTF("/nickbad");
                 }
             }
         }

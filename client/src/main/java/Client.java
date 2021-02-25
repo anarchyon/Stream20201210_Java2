@@ -23,14 +23,17 @@ public class Client {
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
             while (true) {
-                nick = JOptionPane.showInputDialog(gui, "Введите ник:");
-                if (nick == null) {
+                String tNick = JOptionPane.showInputDialog(gui, "Введите ник:");
+                if (tNick == null) {
                     System.exit(0);
                 }
-                out.writeUTF("/nick " + nick);
+                out.writeUTF("/nick " + tNick);
                 String answer = in.readUTF();
                 if (answer.equals("/nickok")) {
+                    nick = tNick;
                     break;
+                } else if (answer.equals("/nickbad")){
+                    JOptionPane.showMessageDialog(gui,"Введённый вами ник уже используется");
                 }
             }
             gui = new ChatWindow(this);
@@ -46,7 +49,7 @@ public class Client {
             while (true) {
                 String incomingMessage = in.readUTF();
                 if (incomingMessage.startsWith(nick)) {
-                    incomingMessage = incomingMessage.replace(nick, "Я");
+                    incomingMessage = incomingMessage.replaceFirst(nick, "Я");
                 }
                 gui.appendText("\n\n" + incomingMessage);
             }
