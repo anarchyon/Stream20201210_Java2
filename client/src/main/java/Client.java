@@ -1,4 +1,3 @@
-import javax.swing.*;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -8,14 +7,14 @@ public class Client {
     private final int PORT = 8189;
     private final String INET_ADDRESS = "localhost";
 
-    public static final String DISCONNECT_SEQUENCE = "/end";
+    public static final String SYSTEM_FLAG_DISCONNECT = "/end";
+    public static final String SYSTEM_FLAG_AUTHORIZATION = "/auth";
+    public static final String SYSTEM_FLAG_PRIVATE_MESSAGE = "/w";
 
     private Socket socket;
     private DataInputStream in;
     private DataOutputStream out;
     private String nick;
-
-    private int num = 1;
 
     private boolean isConnectionOk;
     private boolean isAuthOk;
@@ -47,13 +46,11 @@ public class Client {
 
     public void authentication() throws IOException{
         while (true) {
-            String tNick = "client" + num++;
-            out.writeUTF("/nick " + tNick);
             String answer = in.readUTF();
-            if (answer.equals("/nickok")) {
-                nick = tNick;
+            if (answer.startsWith("/authok")) {
+                nick = answer.replaceFirst("/authok", "");
                 break;
-            } else if (answer.equals("/nickbad")) {
+            } else if (answer.equals("/authbad")) {
                 System.out.println("Введённый вами ник уже используется");
                 //JOptionPane.showMessageDialog(gui, "Введённый вами ник уже используется");
             }
@@ -83,7 +80,7 @@ public class Client {
         try {
             if (!socket.isClosed()) {
                 out.writeUTF(message);
-                if (message.equalsIgnoreCase(DISCONNECT_SEQUENCE)) {
+                if (message.equalsIgnoreCase(SYSTEM_FLAG_DISCONNECT)) {
                     System.exit(0);
                 }
             }

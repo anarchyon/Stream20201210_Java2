@@ -50,7 +50,8 @@ public class ClientHandler {
                 String[] tokens = incomingMessage.split("\\s");
                 nick = server.getAuthService().getNicknameByLoginAndPassword(tokens[1], tokens[2]);
                 if (nick != null) {
-                    out.writeUTF("/authok");
+                    System.out.println("nick is found");
+                    out.writeUTF("/authok" + nick);
                     server.broadcastMessage(nick + " присоединился к чату");
                     server.subscribe(this);
                     isSubscribed = true;

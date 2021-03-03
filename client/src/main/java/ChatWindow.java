@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Arrays;
 
 public class ChatWindow extends JFrame {
     public static final int MINIMUM_WIDTH = 800;
@@ -14,6 +15,9 @@ public class ChatWindow extends JFrame {
     private JTextArea listArea;
     private JTextArea chatArea;
     private JTextField yourMessage;
+    private JTextField loginField = new JTextField();
+    private JTextField passwordField = new JTextField();
+
 
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
@@ -51,7 +55,7 @@ public class ChatWindow extends JFrame {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                client.sendMessage(Client.DISCONNECT_SEQUENCE);
+                sendMessage(Client.SYSTEM_FLAG_DISCONNECT);
                 super.windowClosing(e);
             }
         });
@@ -93,8 +97,14 @@ public class ChatWindow extends JFrame {
         JButton send = new JButton("Отправить");
         //writePanel.setLayout(new BorderLayout());
 
-        send.addActionListener(e -> sendMessage());
-        yourMessage.addActionListener(e -> sendMessage());
+        send.addActionListener(e -> {
+            sendMessage(yourMessage.getText());
+            yourMessage.setText("");
+        });
+        yourMessage.addActionListener(e -> {
+            sendMessage(yourMessage.getText());
+            yourMessage.setText("");
+        });
 
         writePanel.add(yourMessage);
         writePanel.add(send, BorderLayout.EAST);
@@ -109,8 +119,12 @@ public class ChatWindow extends JFrame {
         registerLogon.setResizable(false);
         registerLogon.setLocation((screenSize.width - logonSize.width) / 2, (screenSize.height - logonSize.height) / 2);
         JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+        loginField.setPreferredSize(new Dimension(220, 25));
+        passwordField.setPreferredSize(new Dimension(220, 25));
+
         tabbedPane.addTab("register", registerPanel());
         tabbedPane.addTab("logon", logonPanel());
+        tabbedPane.setSelectedIndex(1);
         registerLogon.add(tabbedPane);
         registerLogon.setVisible(true);
     }
@@ -124,11 +138,17 @@ public class ChatWindow extends JFrame {
         JLabel passwordLabel = new JLabel("Password:", SwingConstants.RIGHT);
 
         logonPanel.add(loginLabel);
-        logonPanel.add(loginField());
+        logonPanel.add(loginField);
         logonPanel.add(passwordLabel);
-        logonPanel.add(passwordField());
+        logonPanel.add(passwordField);
         logonPanel.add(logonButton);
-        logonButton.addActionListener(str -> sendMessage());
+        logonButton.addActionListener(e -> {
+            sendMessage(Client.SYSTEM_FLAG_AUTHORIZATION
+                    + " " + loginField.getText()
+                    + " " + passwordField.getText());
+            loginField.setText("");
+            passwordField.setText("");
+        });
         return logonPanel;
     }
 
@@ -144,25 +164,13 @@ public class ChatWindow extends JFrame {
 
         registerButton.setPreferredSize(new Dimension(150, 30));
         registerPanel.add(loginLabel);
-        registerPanel.add(loginField());
+        registerPanel.add(loginField);
         registerPanel.add(passwordLabel);
-        registerPanel.add(passwordField());
+        registerPanel.add(passwordField);
         registerPanel.add(nickLabel);
         registerPanel.add(nickField);
         registerPanel.add(registerButton);
         return registerPanel;
-    }
-
-    private JTextField loginField() {
-        JTextField loginField = new JTextField();
-        loginField.setPreferredSize(new Dimension(220, 25));
-        return loginField;
-    }
-
-    private JPasswordField passwordField() {
-        JPasswordField passwordField = new JPasswordField();
-        passwordField.setPreferredSize(new Dimension(220, 25));
-        return passwordField;
     }
 
     public void appendText(String message) {
@@ -173,13 +181,10 @@ public class ChatWindow extends JFrame {
         listArea.setText(list);
     }
 
-    private void sendMessage() {
-        yourMessage.grabFocus();
-        if (yourMessage.getText().trim().equals("")) {
+    private void sendMessage(String message) {
+        if (message.trim().isEmpty()) {
             return;
         }
-        String message = yourMessage.getText().trim();
-        client.sendMessage(message);
-        yourMessage.setText("");
+        client.sendMessage(message.trim());
     }
 }
