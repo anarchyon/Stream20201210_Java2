@@ -2,6 +2,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -11,6 +12,9 @@ public class ClientHandler {
     private DataInputStream in;
     private DataOutputStream out;
     private String nick;
+    private boolean isSubscribed;
+
+    private static int num;
 
     public static final String DISCONNECT_SEQUENCE = "/end";
 
@@ -24,10 +28,14 @@ public class ClientHandler {
                 try {
                     authentication();
                     readMessages();
+                } catch (SocketException se) {
+                    System.out.println("Connection with client broken");
                 } catch (IOException e) {
                     e.printStackTrace();
                 } finally {
-                    closeConnection();
+                    if (isSubscribed) {
+                        closeConnection();
+                    }
                 }
             }).start();
         } catch (IOException e) {
@@ -36,22 +44,21 @@ public class ClientHandler {
     }
 
     public void authentication() throws IOException {
-        //TODO
-        while (true) {
+        while (!isSubscribed) {
             String incomingMessage = in.readUTF();
-            if (incomingMessage.startsWith("/nick")) {
-                String tNick = incomingMessage.split("\\s")[1];
-                if (!server.isNickBusy(tNick)) {
-                    out.writeUTF("/nickok");
-                    nick = tNick;
+            if (incomingMessage.startsWith("/auth")) {
+                String[] tokens = incomingMessage.split("\\s");
+                nick = server.getAuthService().getNicknameByLoginAndPassword(tokens[1], tokens[2]);
+                if (nick != null) {
+                    out.writeUTF("/authok");
                     server.broadcastMessage(nick + " присоединился к чату");
-                    break;
+                    server.subscribe(this);
+                    isSubscribed = true;
                 } else {
-                    out.writeUTF("/nickbad");
+                    out.writeUTF("/authbad");
                 }
             }
         }
-        server.subscribe(this);
     }
 
     public void readMessages() throws IOException {

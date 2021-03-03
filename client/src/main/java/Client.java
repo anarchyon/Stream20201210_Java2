@@ -15,32 +15,48 @@ public class Client {
     private DataOutputStream out;
     private String nick;
 
-    ChatWindow gui;
+    private int num = 1;
 
-    public Client() {
+    private boolean isConnectionOk;
+    private boolean isAuthOk;
+    private Callback<Boolean> isTConnectionOk;
+    private Callback<Boolean> isTAuthOk;
+    private Callback<String> callOnMsgReceived;
+    private Callback<String> callOnChangeClientList;
+
+    public void connect() {
         try {
             socket = new Socket(INET_ADDRESS, PORT);
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
-            while (true) {
-                String tNick = JOptionPane.showInputDialog(gui, "Введите ник:");
-                if (tNick == null) {
-                    System.exit(0);
+            isConnectionOk = true;
+            Thread authAndReading = new Thread(() -> {
+                try {
+                    authentication();
+                    readMessages();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-                out.writeUTF("/nick " + tNick);
-                String answer = in.readUTF();
-                if (answer.equals("/nickok")) {
-                    nick = tNick;
-                    break;
-                } else if (answer.equals("/nickbad")){
-                    JOptionPane.showMessageDialog(gui,"Введённый вами ник уже используется");
-                }
-            }
-            gui = new ChatWindow(this);
-            new Thread(this::readMessages).start();
+            });
+            authAndReading.start();
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(gui, "Unable to connect to server");
-            System.exit(0);
+            System.out.println("Unable to connect to server");
+            isConnectionOk = false;
+        }
+    }
+
+    public void authentication() throws IOException{
+        while (true) {
+            String tNick = "client" + num++;
+            out.writeUTF("/nick " + tNick);
+            String answer = in.readUTF();
+            if (answer.equals("/nickok")) {
+                nick = tNick;
+                break;
+            } else if (answer.equals("/nickbad")) {
+                System.out.println("Введённый вами ник уже используется");
+                //JOptionPane.showMessageDialog(gui, "Введённый вами ник уже используется");
+            }
         }
     }
 
@@ -48,14 +64,19 @@ public class Client {
         try {
             while (true) {
                 String incomingMessage = in.readUTF();
-                if (incomingMessage.startsWith(nick)) {
+                if (incomingMessage.startsWith("/list")) {
+                    callOnChangeClientList.callback(incomingMessage.replaceFirst("/list", ""));
+                }else if (incomingMessage.startsWith(nick)) {
                     incomingMessage = incomingMessage.replaceFirst(nick, "Я");
+                    callOnMsgReceived.callback("\n\n" + incomingMessage);
+                } else {
+                    callOnMsgReceived.callback("\n\n" + incomingMessage);
                 }
-                gui.appendText("\n\n" + incomingMessage);
             }
         } catch (IOException e) {
             System.out.println("Socket was closed");
         }
+        closeConnection();
     }
 
     public void sendMessage(String message) {
@@ -73,5 +94,48 @@ public class Client {
 
     public String getNick() {
         return nick;
+    }
+
+    public void closeConnection() {
+        try {
+            in.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.exit(0);
+    }
+
+    public void setCallOnMsgReceived(Callback<String> callOnMsgReceived) {
+        this.callOnMsgReceived = callOnMsgReceived;
+    }
+
+    public void setCallOnChangeClientList(Callback<String> callOnChangeClientList) {
+        this.callOnChangeClientList = callOnChangeClientList;
+    }
+
+    public void setIsTConnectionOk(Callback<Boolean> isTConnectionOk) {
+        this.isTConnectionOk = isTConnectionOk;
+    }
+
+    public void setIsTAuthOk(Callback<Boolean> isTAuthOk) {
+        this.isTAuthOk = isTAuthOk;
+    }
+
+    public boolean isConnectionOk() {
+        return isConnectionOk;
+    }
+
+    public boolean isAuthOk() {
+        return isAuthOk;
     }
 }
