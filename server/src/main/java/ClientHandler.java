@@ -1,3 +1,4 @@
+import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -13,8 +14,8 @@ public class ClientHandler {
     private DataOutputStream out;
     private String nick;
     private boolean isSubscribed;
-
-    private static int num;
+    private final long TIME_FOR_AUTHORIZATION_IN_MILLIS = 120000;
+    private boolean isAuthTimeOut;
 
     public static final String DISCONNECT_SEQUENCE = "/end";
 
@@ -29,9 +30,12 @@ public class ClientHandler {
                     authentication();
                     readMessages();
                 } catch (SocketException se) {
+                    if (isAuthTimeOut) {
+                        System.out.println("Authorization timeout");
+                    }
                     System.out.println("Connection with client broken");
                 } catch (IOException e) {
-                    e.printStackTrace();
+                        e.printStackTrace();
                 } finally {
                     if (isSubscribed) {
                         closeConnection();
@@ -39,25 +43,33 @@ public class ClientHandler {
                 }
             }).start();
         } catch (IOException e) {
-            e.printStackTrace();
+                e.printStackTrace();
         }
     }
 
     public void authentication() throws IOException {
+        long start = System.currentTimeMillis();
         while (!isSubscribed) {
-            String incomingMessage = in.readUTF();
-            if (incomingMessage.startsWith("/auth")) {
-                String[] tokens = incomingMessage.split("\\s");
-                nick = server.getAuthService().getNicknameByLoginAndPassword(tokens[1], tokens[2]);
-                if (nick != null) {
-                    System.out.println("nick is found");
-                    out.writeUTF("/authok" + nick);
-                    server.broadcastMessage(nick + " присоединился к чату");
-                    server.subscribe(this);
-                    isSubscribed = true;
-                } else {
-                    out.writeUTF("/authbad");
+            if (in.available() > 0) {
+                String incomingMessage = in.readUTF();
+                System.out.println(incomingMessage);
+                if (incomingMessage.startsWith("/auth")) {
+                    String[] tokens = incomingMessage.split("\\s");
+                    nick = server.getAuthService().getNicknameByLoginAndPassword(tokens[1], tokens[2]);
+                    if (nick != null) {
+                        System.out.println("Client logged in as " + nick);
+                        out.writeUTF("/authok" + nick);
+                        server.broadcastMessage(nick + " присоединился к чату");
+                        server.subscribe(this);
+                        isSubscribed = true;
+                    } else {
+                        out.writeUTF("/authbad");
+                    }
                 }
+            }
+            if (System.currentTimeMillis() - start > TIME_FOR_AUTHORIZATION_IN_MILLIS) {
+                isAuthTimeOut = true;
+                out.writeUTF("/authtimeout");
             }
         }
     }
@@ -91,7 +103,7 @@ public class ClientHandler {
         }
     }
 
-    private String buildString (String str) {
+    private String buildString(String str) {
         return String.format("%s (%s): %s",
                 nick,
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm:ss")),
@@ -99,8 +111,10 @@ public class ClientHandler {
     }
 
     public void closeConnection() {
-        server.unsubscribe(this);
-        server.broadcastMessage(nick + " вышел из чата");
+        if (isSubscribed) {
+            server.unsubscribe(this);
+            server.broadcastMessage(nick + " вышел из чата");
+        }
         try {
             in.close();
         } catch (IOException e) {

@@ -17,9 +17,7 @@ public class Client {
     private String nick;
 
     private boolean isConnectionOk;
-    private boolean isAuthOk;
-    private Callback<Boolean> isTConnectionOk;
-    private Callback<Boolean> isTAuthOk;
+    private Callback<Boolean> isAuthOk;
     private Callback<String> callOnMsgReceived;
     private Callback<String> callOnChangeClientList;
 
@@ -49,10 +47,15 @@ public class Client {
             String answer = in.readUTF();
             if (answer.startsWith("/authok")) {
                 nick = answer.replaceFirst("/authok", "");
+                isAuthOk.callback(true);
                 break;
             } else if (answer.equals("/authbad")) {
-                System.out.println("Введённый вами ник уже используется");
+                System.out.println("Invalid login data");
+                isAuthOk.callback(false);
                 //JOptionPane.showMessageDialog(gui, "Введённый вами ник уже используется");
+            } else if (answer.equals("/authtimeout")) {
+                System.out.println("Connection broken by timeout");
+                closeConnection();
             }
         }
     }
@@ -120,19 +123,11 @@ public class Client {
         this.callOnChangeClientList = callOnChangeClientList;
     }
 
-    public void setIsTConnectionOk(Callback<Boolean> isTConnectionOk) {
-        this.isTConnectionOk = isTConnectionOk;
-    }
-
-    public void setIsTAuthOk(Callback<Boolean> isTAuthOk) {
-        this.isTAuthOk = isTAuthOk;
+    public void setIsAuthOk(Callback<Boolean> isAuthOk) {
+        this.isAuthOk = isAuthOk;
     }
 
     public boolean isConnectionOk() {
         return isConnectionOk;
-    }
-
-    public boolean isAuthOk() {
-        return isAuthOk;
     }
 }

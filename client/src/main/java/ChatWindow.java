@@ -1,27 +1,28 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.util.Arrays;
+import java.awt.event.*;
 
 public class ChatWindow extends JFrame {
-    public static final int MINIMUM_WIDTH = 800;
-    public static final int MINIMUM_HEIGHT = 600;
-    public static final int LOGON_MINIMUM_WIDTH = 350;
-    public static final int LOGON_MINIMUM_HEIGHT = 200;
+    public static final int MAIN_WINDOW_MINIMUM_WIDTH = 800;
+    public static final int MAIN_WINDOW_MINIMUM_HEIGHT = 600;
+    public static final int LOGON_MINIMUM_WIDTH = 380;
+    public static final int LOGON_MINIMUM_HEIGHT = 220;
 
 
     private JFrame registerLogon;
     private JTextArea listArea;
     private JTextArea chatArea;
     private JTextField yourMessage;
-    private JTextField loginField = new JTextField();
-    private JTextField passwordField = new JTextField();
 
+    private JTextField loginField;
+    private JTextField passwordField;
+    private JTextField registerLoginField;
+    private JTextField registerPasswordField;
+    private JTextField nickField;
 
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
-    private Client client;
+    private final Client client;
 
     public ChatWindow() {
         this.client = new Client();
@@ -36,18 +37,27 @@ public class ChatWindow extends JFrame {
         }
 
         setRegisterLogonWindow();
-
-        setTitle(client.getNick());
-        yourMessage.grabFocus();
     }
 
     private void setCallbacks() {
         client.setCallOnChangeClientList(this::listMembers);
         client.setCallOnMsgReceived(this::appendText);
+        client.setIsAuthOk(this::showMainWindow);
+    }
+
+    private void showMainWindow(Boolean isAuthOk) {
+        if (isAuthOk) {
+            registerLogon.setVisible(false);
+            this.setTitle(client.getNick());
+            this.setVisible(true);
+            yourMessage.grabFocus();
+        } else {
+            JOptionPane.showMessageDialog(this, "Invalid login data");
+        }
     }
 
     private void setMainWindow() {
-        Dimension windowSize = new Dimension(MINIMUM_WIDTH, MINIMUM_HEIGHT);
+        Dimension windowSize = new Dimension(MAIN_WINDOW_MINIMUM_WIDTH, MAIN_WINDOW_MINIMUM_HEIGHT);
         setSize(windowSize);
         setMinimumSize(windowSize);
         setLocation((screenSize.width - windowSize.width) / 2, (screenSize.height - windowSize.height) / 2);
@@ -66,12 +76,11 @@ public class ChatWindow extends JFrame {
     }
 
     private JPanel listPanel() {
-        JPanel listPanel = new JPanel();
+        JPanel listPanel = new JPanel(new BorderLayout());
         listPanel.setBorder(BorderFactory.createTitledBorder("List"));
         listArea = new JTextArea();
         listArea.setEditable(false);
 
-        listPanel.setLayout(new BorderLayout());
         listPanel.add(new JScrollPane(listArea, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
 
         return listPanel;
@@ -85,7 +94,6 @@ public class ChatWindow extends JFrame {
         chatArea.setLineWrap(true);
         chatArea.setWrapStyleWord(true);
 
-        //chatPanel.setLayout(new BorderLayout());
         chatPanel.add(new JScrollPane(chatArea));
 
         return chatPanel;
@@ -95,16 +103,14 @@ public class ChatWindow extends JFrame {
         JPanel writePanel = new JPanel(new BorderLayout());
         yourMessage = new JTextField();
         JButton send = new JButton("Отправить");
-        //writePanel.setLayout(new BorderLayout());
 
-        send.addActionListener(e -> {
+        ActionListener sendListener = e -> {
             sendMessage(yourMessage.getText());
             yourMessage.setText("");
-        });
-        yourMessage.addActionListener(e -> {
-            sendMessage(yourMessage.getText());
-            yourMessage.setText("");
-        });
+        };
+
+        send.addActionListener(sendListener);
+        yourMessage.addActionListener(sendListener);
 
         writePanel.add(yourMessage);
         writePanel.add(send, BorderLayout.EAST);
@@ -119,57 +125,108 @@ public class ChatWindow extends JFrame {
         registerLogon.setResizable(false);
         registerLogon.setLocation((screenSize.width - logonSize.width) / 2, (screenSize.height - logonSize.height) / 2);
         JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-        loginField.setPreferredSize(new Dimension(220, 25));
-        passwordField.setPreferredSize(new Dimension(220, 25));
 
         tabbedPane.addTab("register", registerPanel());
         tabbedPane.addTab("logon", logonPanel());
         tabbedPane.setSelectedIndex(1);
+        tabbedPane.addChangeListener(e -> {
+            loginField.setText("");
+            passwordField.setText("");
+            registerLoginField.setText("");
+            registerPasswordField.setText("");
+            nickField.setText("");
+        });
         registerLogon.add(tabbedPane);
         registerLogon.setVisible(true);
+
     }
 
     private JPanel logonPanel() {
         JPanel logonPanel = new JPanel();
-        logonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        logonPanel.setLayout(new BorderLayout());
+
+        JPanel fieldsGrid = new JPanel(new GridLayout(2,1));
+        JPanel loginPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JLabel loginLabel = new JLabel("Login:", SwingConstants.RIGHT);
+        loginField = new JTextField();
+        loginField.setPreferredSize(new Dimension(220, 25));
+        loginPanel.add(loginLabel);
+        loginPanel.add(loginField);
+
+        JPanel passwordPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JLabel passwordLabel = new JLabel("Password:", SwingConstants.RIGHT);
+        passwordField = new JTextField();
+        passwordField.setPreferredSize(new Dimension(220, 25));
+        passwordPanel.add(passwordLabel);
+        passwordPanel.add(passwordField);
+        fieldsGrid.add(loginPanel);
+        fieldsGrid.add(passwordPanel);
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton logonButton = new JButton("Вход");
         logonButton.setPreferredSize(new Dimension(150, 30));
-        JLabel loginLabel = new JLabel("Login:", SwingConstants.RIGHT);
-        JLabel passwordLabel = new JLabel("Password:", SwingConstants.RIGHT);
+        buttonPanel.add(logonButton);
 
-        logonPanel.add(loginLabel);
-        logonPanel.add(loginField);
-        logonPanel.add(passwordLabel);
-        logonPanel.add(passwordField);
-        logonPanel.add(logonButton);
+        logonPanel.add(fieldsGrid, BorderLayout.NORTH);
+        logonPanel.add(buttonPanel, BorderLayout.SOUTH);
+
         logonButton.addActionListener(e -> {
-            sendMessage(Client.SYSTEM_FLAG_AUTHORIZATION
-                    + " " + loginField.getText()
-                    + " " + passwordField.getText());
+            String login = loginField.getText();
+            String password = passwordField.getText();
             loginField.setText("");
             passwordField.setText("");
+            if (login.trim().isEmpty() || password.trim().isEmpty()) {
+                return;
+            }
+            sendMessage(Client.SYSTEM_FLAG_AUTHORIZATION
+                    + " " + login.trim()
+                    + " " + password.trim());
         });
+
         return logonPanel;
     }
 
     private JPanel registerPanel() {
         JPanel registerPanel = new JPanel();
-        registerPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
-        JTextField nickField = new JTextField();
-        nickField.setPreferredSize(new Dimension(220, 25));
-        JButton registerButton = new JButton("Регистрация");
-        JLabel loginLabel = new JLabel("Login:", SwingConstants.RIGHT);
-        JLabel passwordLabel = new JLabel("Password:", SwingConstants.RIGHT);
-        JLabel nickLabel = new JLabel("Nickname:", SwingConstants.RIGHT);
+        registerPanel.setLayout(new BorderLayout());
 
+        JPanel loginPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JLabel loginLabel = new JLabel("Login:", SwingConstants.RIGHT);
+        registerLoginField = new JTextField();
+        registerLoginField.setPreferredSize(new Dimension(220, 25));
+        loginPanel.add(loginLabel);
+        loginPanel.add(registerLoginField);
+
+        JPanel passwordPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JLabel passwordLabel = new JLabel("Password:", SwingConstants.RIGHT);
+        registerPasswordField = new JTextField();
+        registerPasswordField.setPreferredSize(new Dimension(220, 25));
+        passwordPanel.add(passwordLabel);
+        passwordPanel.add(registerPasswordField);
+
+        JPanel nickPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JLabel nickLabel = new JLabel("Nickname:", SwingConstants.RIGHT);
+        nickField = new JTextField();
+        nickField.setPreferredSize(new Dimension(220, 25));
+        nickPanel.add(nickLabel);
+        nickPanel.add(nickField);
+
+        JPanel fieldsGrid = new JPanel(new GridLayout(3,1));
+        fieldsGrid.add(loginPanel);
+        fieldsGrid.add(passwordPanel);
+        fieldsGrid.add(nickPanel);
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JButton registerButton = new JButton("Регистрация");
         registerButton.setPreferredSize(new Dimension(150, 30));
-        registerPanel.add(loginLabel);
-        registerPanel.add(loginField);
-        registerPanel.add(passwordLabel);
-        registerPanel.add(passwordField);
-        registerPanel.add(nickLabel);
-        registerPanel.add(nickField);
-        registerPanel.add(registerButton);
+        buttonPanel.add(registerButton);
+
+        registerButton.addActionListener(e -> JOptionPane.showMessageDialog(registerLogon, "//TODO"));
+
+        registerPanel.add(fieldsGrid, BorderLayout.NORTH);
+        registerPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        registerPanel.setEnabled(false);
         return registerPanel;
     }
 

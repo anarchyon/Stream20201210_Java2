@@ -14,7 +14,7 @@ public class Server {
         authService = new DBAuthService();
         if (!DBAuthService.isConnected()) {
             authService = new BaseAuthService();
-            System.out.println("DB is not connected");
+            System.out.println("DB is not connected, using BaseAuthService");
         }
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
             System.out.println("Server is listening");
