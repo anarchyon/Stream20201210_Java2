@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.text.AbstractDocument;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -23,6 +24,13 @@ public class ChatWindow extends JFrame {
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
     private final Client client;
+    private WindowListener closeListener = new WindowAdapter() {
+        @Override
+        public void windowClosing(WindowEvent e) {
+            sendMessage(Client.SYSTEM_FLAG_DISCONNECT);
+            super.windowClosing(e);
+        }
+    };
 
     public ChatWindow() {
         this.client = new Client();
@@ -42,17 +50,26 @@ public class ChatWindow extends JFrame {
     private void setCallbacks() {
         client.setCallOnChangeClientList(this::listMembers);
         client.setCallOnMsgReceived(this::appendText);
-        client.setIsAuthOk(this::showMainWindow);
+        client.setGetAuthStatus(this::showMainWindow);
     }
 
-    private void showMainWindow(Boolean isAuthOk) {
-        if (isAuthOk) {
-            registerLogon.setVisible(false);
-            this.setTitle(client.getNick());
-            this.setVisible(true);
-            yourMessage.grabFocus();
-        } else {
-            JOptionPane.showMessageDialog(this, "Invalid login data");
+    private void showMainWindow(int authStatus) {
+        switch (authStatus) {
+            case Client.AUTHORIZATION_OK:
+                registerLogon.setVisible(false);
+                this.setTitle(client.getNick());
+                this.setVisible(true);
+                yourMessage.grabFocus();
+                break;
+            case Client.AUTHORIZATION_BAD:
+                JOptionPane.showMessageDialog(this, "Invalid login data");
+                break;
+            case Client.AUTHORIZATION_BUSY:
+                JOptionPane.showMessageDialog(this, "Client with such data is logged in already");
+                break;
+            case Client.AUTHORIZATION_TIMEOUT:
+                JOptionPane.showMessageDialog(this, "Authorization timeout");
+                break;
         }
     }
 
@@ -62,13 +79,7 @@ public class ChatWindow extends JFrame {
         setMinimumSize(windowSize);
         setLocation((screenSize.width - windowSize.width) / 2, (screenSize.height - windowSize.height) / 2);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                sendMessage(Client.SYSTEM_FLAG_DISCONNECT);
-                super.windowClosing(e);
-            }
-        });
+        addWindowListener(closeListener);
 
         add(listPanel(), BorderLayout.NORTH);
         add(chatPanel());
@@ -137,6 +148,7 @@ public class ChatWindow extends JFrame {
             nickField.setText("");
         });
         registerLogon.add(tabbedPane);
+        registerLogon.addWindowListener(closeListener);
         registerLogon.setVisible(true);
 
     }
@@ -145,11 +157,12 @@ public class ChatWindow extends JFrame {
         JPanel logonPanel = new JPanel();
         logonPanel.setLayout(new BorderLayout());
 
-        JPanel fieldsGrid = new JPanel(new GridLayout(2,1));
+        JPanel fieldsGrid = new JPanel(new GridLayout(2, 1));
         JPanel loginPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JLabel loginLabel = new JLabel("Login:", SwingConstants.RIGHT);
         loginField = new JTextField();
         loginField.setPreferredSize(new Dimension(220, 25));
+        ((AbstractDocument)loginField.getDocument()).setDocumentFilter(new LoginPassDocumentFilter());
         loginPanel.add(loginLabel);
         loginPanel.add(loginField);
 
@@ -157,6 +170,7 @@ public class ChatWindow extends JFrame {
         JLabel passwordLabel = new JLabel("Password:", SwingConstants.RIGHT);
         passwordField = new JTextField();
         passwordField.setPreferredSize(new Dimension(220, 25));
+        ((AbstractDocument)passwordField.getDocument()).setDocumentFilter(new LoginPassDocumentFilter());
         passwordPanel.add(passwordLabel);
         passwordPanel.add(passwordField);
         fieldsGrid.add(loginPanel);
@@ -194,6 +208,7 @@ public class ChatWindow extends JFrame {
         JLabel loginLabel = new JLabel("Login:", SwingConstants.RIGHT);
         registerLoginField = new JTextField();
         registerLoginField.setPreferredSize(new Dimension(220, 25));
+        ((AbstractDocument)registerLoginField.getDocument()).setDocumentFilter(new LoginPassDocumentFilter());
         loginPanel.add(loginLabel);
         loginPanel.add(registerLoginField);
 
@@ -201,6 +216,7 @@ public class ChatWindow extends JFrame {
         JLabel passwordLabel = new JLabel("Password:", SwingConstants.RIGHT);
         registerPasswordField = new JTextField();
         registerPasswordField.setPreferredSize(new Dimension(220, 25));
+        ((AbstractDocument)registerPasswordField.getDocument()).setDocumentFilter(new LoginPassDocumentFilter());
         passwordPanel.add(passwordLabel);
         passwordPanel.add(registerPasswordField);
 
@@ -211,7 +227,7 @@ public class ChatWindow extends JFrame {
         nickPanel.add(nickLabel);
         nickPanel.add(nickField);
 
-        JPanel fieldsGrid = new JPanel(new GridLayout(3,1));
+        JPanel fieldsGrid = new JPanel(new GridLayout(3, 1));
         fieldsGrid.add(loginPanel);
         fieldsGrid.add(passwordPanel);
         fieldsGrid.add(nickPanel);

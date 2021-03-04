@@ -32,9 +32,13 @@ public class Server {
         return authService;
     }
 
-    public synchronized void broadcastMessage(String message) {
+    public synchronized void broadcastMessage(ClientHandler sender, String message) {
         for (ClientHandler client : clients) {
-            client.sendMessage(message);
+            if (sender == null){
+                client.sendMessage(message);
+            } else {
+                client.sendMessage(sender.getNick() + message);
+            }
         }
     }
 
@@ -44,16 +48,21 @@ public class Server {
             list.add(client.getNick());
         }
         String stringList = "/list" + list.toString();
-        broadcastMessage(stringList);
+        broadcastMessage(null, stringList);
     }
 
-    public void privateMessage(String nick, String message) {
+    public void privateMessage(ClientHandler sender, String nick, String message) {
+        if (sender.getNick().equals(nick)) {
+            return;
+        }
         for (ClientHandler client : clients) {
             if (client.getNick().equals(nick)) {
-                client.sendMessage(message);
-                break;
+                client.sendMessage("(private from)" + sender.getNick() + message);
+                sender.sendMessage("(private to)" + client.getNick() + message);
+                return;
             }
         }
+        sender.sendMessage(nick + " not found in chat");
     }
 
     public synchronized boolean isNickBusy(String nick) {

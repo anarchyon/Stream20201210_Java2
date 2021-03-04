@@ -23,10 +23,10 @@ public class DBAuthService implements AuthService{
     @Override
     public String getNicknameByLoginAndPassword(String login, String password) {
         try (PreparedStatement statement = connection.prepareStatement(
-                "SELECT nick FROM chat_clients WHERE login='" + login + "' AND pass='" + password + "'");
+                "SELECT * FROM chat_clients WHERE login='" + login + "' AND pass='" + password + "'");
              ResultSet result = statement.executeQuery()) {
             if (result.next()) {
-                return result.getString("nick");
+                return result.getString("nick").trim();
             }
         } catch (SQLException throwables) {
             throwables.printStackTrace();

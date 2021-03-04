@@ -10,6 +10,10 @@ public class Client {
     public static final String SYSTEM_FLAG_DISCONNECT = "/end";
     public static final String SYSTEM_FLAG_AUTHORIZATION = "/auth";
     public static final String SYSTEM_FLAG_PRIVATE_MESSAGE = "/w";
+    public static final int AUTHORIZATION_OK = 0;
+    public static final int AUTHORIZATION_BAD = 1;
+    public static final int AUTHORIZATION_BUSY = 2;
+    public static final int AUTHORIZATION_TIMEOUT = 3;
 
     private Socket socket;
     private DataInputStream in;
@@ -17,7 +21,7 @@ public class Client {
     private String nick;
 
     private boolean isConnectionOk;
-    private Callback<Boolean> isAuthOk;
+    private Callback<Integer> getAuthStatus;
     private Callback<String> callOnMsgReceived;
     private Callback<String> callOnChangeClientList;
 
@@ -47,14 +51,17 @@ public class Client {
             String answer = in.readUTF();
             if (answer.startsWith("/authok")) {
                 nick = answer.replaceFirst("/authok", "");
-                isAuthOk.callback(true);
+                getAuthStatus.callback(AUTHORIZATION_OK);
                 break;
             } else if (answer.equals("/authbad")) {
                 System.out.println("Invalid login data");
-                isAuthOk.callback(false);
-                //JOptionPane.showMessageDialog(gui, "Введённый вами ник уже используется");
+                getAuthStatus.callback(AUTHORIZATION_BAD);
+            } else if (answer.equals("/authbusy")) {
+                System.out.println("Client is logged in already");
+                getAuthStatus.callback(AUTHORIZATION_BUSY);
             } else if (answer.equals("/authtimeout")) {
                 System.out.println("Connection broken by timeout");
+                getAuthStatus.callback(AUTHORIZATION_TIMEOUT);
                 closeConnection();
             }
         }
@@ -123,8 +130,8 @@ public class Client {
         this.callOnChangeClientList = callOnChangeClientList;
     }
 
-    public void setIsAuthOk(Callback<Boolean> isAuthOk) {
-        this.isAuthOk = isAuthOk;
+    public void setGetAuthStatus(Callback<Integer> getAuthStatus) {
+        this.getAuthStatus = getAuthStatus;
     }
 
     public boolean isConnectionOk() {
