@@ -93,6 +93,7 @@ public class Main {
 
         //попытка пересыпать апельсины в коробку с яблоками дает ошибку времени компиляции - java: incompatible types
         //box3.loadFruitFrom(box4);
+        //box3.loadFruitFrom(new SmallBox<Orange>());
     }
 
     //1. Написать метод, который меняет два элемента массива местами (массив может быть любого ссылочного типа)
