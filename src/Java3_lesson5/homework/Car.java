@@ -1,6 +1,5 @@
 package Java3_lesson5.homework;
 
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -11,8 +10,8 @@ public class Car implements Runnable{
     private static AtomicInteger CARS_COUNT;
     private static AtomicBoolean IS_WIN;
     private static Lock lock;
-    private final CyclicBarrier cbWaitOtherCars;
-    private final CountDownLatch cdlWaitStart;
+    private final CyclicBarrier barrier;
+//    private final CountDownLatch cdlWaitStart;
 
     static {
         CARS_COUNT = new AtomicInteger(0);
@@ -32,13 +31,13 @@ public class Car implements Runnable{
         return speed;
     }
 
-    public Car(Race race, int speed, CyclicBarrier cbWaitOtherCars, CountDownLatch cdlWaitStart) {
+    public Car(Race race, int speed, CyclicBarrier barrier) {
         this.race = race;
         this.speed = speed;
         CARS_COUNT.incrementAndGet();
         this.name = "Участник #" + CARS_COUNT;
-        this.cbWaitOtherCars = cbWaitOtherCars;
-        this.cdlWaitStart = cdlWaitStart;
+        this.barrier = barrier;
+//        this.cdlWaitStart = cdlWaitStart;
     }
 
     @Override
@@ -47,8 +46,9 @@ public class Car implements Runnable{
             System.out.println(this.name + " готовится");
             Thread.sleep(500 + (int)(Math.random() * 800));
             System.out.println(this.name + " готов");
-            cdlWaitStart.countDown();
-            cbWaitOtherCars.await();
+//            cdlWaitStart.countDown();
+            barrier.await();
+            barrier.await();
         } catch (Exception e) {
             e.printStackTrace();
         }
